@@ -18,7 +18,7 @@ import re
 import string
 
 EVAL_MODE_DICT = {True: 'evaluation', False: 'training'}
-TIME_FORMAT = '%Y/%m/%d %H:%M:%S'
+TIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f%z'
 
 try:
     import nvidia_smi
