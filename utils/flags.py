@@ -468,7 +468,7 @@ class Flags():
         if self.args.num_workers is None:
             self.args.num_workers = 4 * self.args.num_gpus
         cpu_threads = os.cpu_count()
-        if self.args.num_workers >= cpu_threads:
+        if self.args.num_workers > cpu_threads:
             self.args.num_workers = cpu_threads
             print(f'Too much workers for the dataloader! Your cpu has only {cpu_threads} threads, so the number of workers was set to {cpu_threads}')
 
