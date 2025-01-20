@@ -27,8 +27,8 @@ try:
         """
 
         def __init__(self, num_gpus):
-            nvidia_smi.nvmlInit()
-            self.num_gpus = num_gpus
+            # nvidia_smi.nvmlInit()
+            self.num_gpus = 1 # num_gpus
             self.gpu_temp_list = []
             self.fan_speed_list = []
             self.gpu_usage_list = []
@@ -38,7 +38,7 @@ try:
         def get_driver_version():
             """Returns the installed nvidia driver version.
             """
-            version = nvidia_smi.nvmlSystemGetDriverVersion()
+            version = "0.0"  # nvidia_smi.nvmlSystemGetDriverVersion()
             try:
                 version = version.decode()
             except AttributeError:
@@ -70,17 +70,17 @@ try:
         def get_current_attributes(gpu_id):
             """Returns tuple with gpu attributes for given gpu id.
             """
-            handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
+            # handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
 
-            gpu_temp = nvidia_smi.nvmlDeviceGetTemperature(handle, 0)
+            gpu_temp = -1  # nvidia_smi.nvmlDeviceGetTemperature(handle, 0)
             try:
-                fan_speed = nvidia_smi.nvmlDeviceGetFanSpeed(handle)
+                fan_speed = -1  # nvidia_smi.nvmlDeviceGetFanSpeed(handle)
             except nvidia_smi.NVMLError:
                 fan_speed = 0
 
-            gpu_usage = nvidia_smi.nvmlDeviceGetUtilizationRates(handle).gpu
-            memory_info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-            memory_usage = memory_info.used, memory_info.total
+            gpu_usage = 0  # nvidia_smi.nvmlDeviceGetUtilizationRates(handle).gpu
+            # memory_info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+            memory_usage = 0, 0 # memory_info.used, memory_info.total
 
             return gpu_temp, fan_speed, gpu_usage, memory_usage
 
@@ -392,8 +392,8 @@ class Protocol(object):
                 it_per_sec= None
             progress_prompt_str = self.make_progress_prompt_string(epoch, step, total_steps, loss, it_per_sec)
 
-            if self.gpu_info:
-                progress_prompt_str += self.gpu_info.get_gpu_info_str()
+            # if self.gpu_info:
+            #     progress_prompt_str += self.gpu_info.get_gpu_info_str()
 
             print(progress_prompt_str, end = '')
             if self.args.log_file and self.args.log_benchmark:
