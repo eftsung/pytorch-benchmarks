@@ -406,13 +406,13 @@ class Protocol(object):
         """
         now = datetime.now()
         now_str = now.strftime(TIME_FORMAT)
-        progress_prompt_string = f'{now_str} Epoch [{epoch} / {self.args.load_from_epoch + self.args.num_epochs}], Step [{step} / {total_steps}]'
+        progress_prompt_string = f'{now_str} Epoch [{epoch}/{self.args.load_from_epoch + self.args.num_epochs}], Step [{step}/{total_steps}]'
         if not self.eval_mode:
             loss_item = loss.detach().item()
             progress_prompt_string += f', Loss: {loss_item:.4f}'
 
         if it_per_sec:
-            progress_prompt_string += f',  {self.args.iterations} per second: {it_per_sec:.1f}'
+            progress_prompt_string += f', {it_per_sec:.1f} {self.args.iterations}/sec'
         progress_prompt_string += '\n'
         return progress_prompt_string
 
