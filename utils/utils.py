@@ -415,7 +415,7 @@ class Protocol(object):
         """Creates and returns the benchmark prompt string for given arguments.
         """
         now_str = dt_now_to_str()
-        progress_prompt_string = f'{now_str} Epoch [{epoch}/{self.args.load_from_epoch + self.args.num_epochs}], Step [{step}/{total_steps}]'
+        progress_prompt_string = f'{now_str} Epoch {epoch}/{self.args.load_from_epoch + self.args.num_epochs}, Step {step}/{total_steps}'
         if not self.eval_mode:
             loss_item = loss.detach().item()
             progress_prompt_string += f', Loss: {loss_item:.4f}'

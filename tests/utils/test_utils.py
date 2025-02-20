@@ -68,7 +68,7 @@ class TestProtocolMakeProgressPromptString:
             )
 
         # Assert
-        expected = "dummy_dt_string Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
+        expected = "dummy_dt_string Epoch 1/5, Step 2/3500, 325.7 Dummy_Images/sec\n"
         assert result == expected
 
     def test_with_loss(self, protocol_fixture):
@@ -97,7 +97,7 @@ class TestProtocolMakeProgressPromptString:
             )
 
         # Assert
-        expected = "dummy_dt_string Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
+        expected = "dummy_dt_string Epoch 1/5, Step 2/3500, Loss: 6.8346, 325.7 Dummy_Images/sec\n"
         assert result == expected
         loss.detach.assert_called_once_with()
         detach.item.assert_called_once_with()
