@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest.mock import Mock, patch
 
 import pytest
-from utils.utils import Protocol
+from utils.utils import Protocol, dt_now_to_str
 
 
 @pytest.fixture
@@ -17,6 +17,30 @@ def protocol_fixture():
     data = "test data"
 
     return Protocol(rank, args, model, data)
+
+
+@pytest.mark.parametrize(
+    "input_time,expected",
+    [
+        ((2020, 3, 13, 10, 22, 7), "2020-03-13 10:22:07.00"),
+        ((2025, 2, 19, 16, 55, 3, 708629), "2025-02-19 16:55:03.70"),
+        ((2025, 2, 19, 16, 55, 3, 700000), "2025-02-19 16:55:03.70"),
+        ((2030, 1, 1), "2030-01-01 00:00:00.00")
+    ]
+)
+def test_dt_now_to_str(input_time, expected):
+    """Tests dt_now_to_str with different input times"""
+
+    # Arrange
+    mocked_datetime = Mock()
+    mocked_datetime.now.configure_mock(return_value=datetime(*input_time))
+
+    # Act
+    with patch("utils.utils.datetime", mocked_datetime):
+        actual = dt_now_to_str()
+
+    # Assert
+    assert actual == expected
 
 
 class TestProtocolMakeProgressPromptString:
@@ -45,7 +69,7 @@ class TestProtocolMakeProgressPromptString:
             )
 
         # Assert
-        expected = "2025-02-19 16:55:03.708629 Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
+        expected = "2025-02-19 16:55:03.70 Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
         assert result == expected
 
     def test_with_loss(self, protocol_fixture):
@@ -75,7 +99,7 @@ class TestProtocolMakeProgressPromptString:
             )
 
         # Assert
-        expected = "2025-02-19 16:55:03.708629 Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
+        expected = "2025-02-19 16:55:03.70 Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
         assert result == expected
         loss.detach.assert_called_once_with()
         detach.item.assert_called_once_with()
@@ -164,7 +188,7 @@ Used data augmentation: True
 Checkpoint folder: /pytorch-benchmarks/model_checkpoints/dummy_1_NVIDIAGeForceGTX1650_resnet50_64_lr0001
 Number of workers: 7
 Warm up steps: 11
-Benchmark start : 2025-02-19 16:55:03.708629
+Benchmark start : 2025-02-19 16:55:03.70
 
 """
         assert result == expected

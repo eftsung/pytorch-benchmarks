@@ -18,7 +18,12 @@ import re
 import string
 
 EVAL_MODE_DICT = {True: 'evaluation', False: 'training'}
-TIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f%z'
+
+
+def dt_now_to_str():
+    """Converts datetime to a string with only 100s of seconds"""
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f%z")[:-4]
+
 
 try:
     import nvidia_smi
@@ -373,8 +378,7 @@ class Protocol(object):
                     for key, value in evaluation_results_per_epoch.items():
                         total_evaluation_results_str += f'{key}: {value}   '
 
-            now = datetime.now()
-            end_time = now.strftime(TIME_FORMAT)
+            end_time = dt_now_to_str()
             final_str = mean_it_per_sec_str + max_temp_str + total_evaluation_results_str + self.error_report + f'\n\nBenchmark end: {end_time}\n'
             if self.args.log_file:
                 self.log_file.finish_log_file(final_str)
@@ -404,8 +408,7 @@ class Protocol(object):
     def make_progress_prompt_string(self, epoch, step, total_steps, loss=None, it_per_sec=None):
         """Creates and returns the benchmark prompt string for given arguments.
         """
-        now = datetime.now()
-        now_str = now.strftime(TIME_FORMAT)
+        now_str = dt_now_to_str()
         progress_prompt_string = f'{now_str} Epoch [{epoch}/{self.args.load_from_epoch + self.args.num_epochs}], Step [{step}/{total_steps}]'
         if not self.eval_mode:
             loss_item = loss.detach().item()
@@ -446,7 +449,7 @@ class Protocol(object):
         shown at the beginning of the benchmark and in the protocol.
         """
         if self.rank == 0:
-            start_time = datetime.now().strftime(TIME_FORMAT)
+            start_time = dt_now_to_str()
             cpu_name = 'unknown'
             for line in subprocess.check_output("lscpu", shell=True).strip().decode().split('\n'):
                 if 'Modellname' in line or 'Model name' in line:
