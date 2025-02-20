@@ -26,6 +26,10 @@ class TestProtocolMakeProgressPromptString:
     def test_base(self, protocol_fixture):
         """Basic Test"""
         # Arrange
+        mocked_datetime = Mock()
+        current_time_mocked_value = datetime(2025, 2, 19, 16, 55, 3, 708629)
+        mocked_datetime.now.configure_mock(return_value=current_time_mocked_value)
+
         epoch = 1
         step = 2
         total_steps = 3500
@@ -35,17 +39,22 @@ class TestProtocolMakeProgressPromptString:
         protocol_fixture.args.num_epochs = 5
 
         # Act
-        result = protocol_fixture.make_progress_prompt_string(
-            epoch, step, total_steps, it_per_sec=it_per_sec
-        )
+        with patch("utils.utils.datetime", mocked_datetime):
+            result = protocol_fixture.make_progress_prompt_string(
+                epoch, step, total_steps, it_per_sec=it_per_sec
+            )
 
         # Assert
-        expected = "Epoch [1 / 5], Step [2 / 3500],  Dummy_Images per second: 325.7\n"
+        expected = "2025-02-19 16:55:03.708629 Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
         assert result == expected
 
     def test_with_loss(self, protocol_fixture):
         """Test where loss is specified"""
         # Arrange
+        mocked_datetime = Mock()
+        current_time_mocked_value = datetime(2025, 2, 19, 16, 55, 3, 708629)
+        mocked_datetime.now.configure_mock(return_value=current_time_mocked_value)
+
         epoch = 1
         step = 2
         total_steps = 3500
@@ -60,12 +69,13 @@ class TestProtocolMakeProgressPromptString:
         protocol_fixture.args.num_epochs = 5
 
         # Act
-        result = protocol_fixture.make_progress_prompt_string(
-            epoch, step, total_steps, loss=loss, it_per_sec=it_per_sec
-        )
+        with patch("utils.utils.datetime", mocked_datetime):
+            result = protocol_fixture.make_progress_prompt_string(
+                epoch, step, total_steps, loss=loss, it_per_sec=it_per_sec
+            )
 
         # Assert
-        expected = "Epoch [1 / 5], Step [2 / 3500], Loss: 6.8346,  Dummy_Images per second: 325.7\n"
+        expected = "2025-02-19 16:55:03.708629 Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
         assert result == expected
         loss.detach.assert_called_once_with()
         detach.item.assert_called_once_with()
@@ -154,7 +164,7 @@ Used data augmentation: True
 Checkpoint folder: /pytorch-benchmarks/model_checkpoints/dummy_1_NVIDIAGeForceGTX1650_resnet50_64_lr0001
 Number of workers: 7
 Warm up steps: 11
-Benchmark start : 2025/02/19 16:55:03
+Benchmark start : 2025-02-19 16:55:03.708629
 
 """
         assert result == expected
