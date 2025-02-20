@@ -1,4 +1,6 @@
 !.gitignore
+/.idea/
+
 *.txt
 !requirements.txt
 .directory
@@ -9,6 +11,8 @@ test.py
 /data/__pycache__/
 /utils/__pycache__/
 /models/__pycache__/
+/tests/__pycache__/
+/tests/utils/__pycache__/
 /log/
 *.pt
 !/data/bert_base/bert_base_cased_vocab.txt
