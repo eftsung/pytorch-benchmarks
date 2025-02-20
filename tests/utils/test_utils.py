@@ -50,9 +50,8 @@ class TestProtocolMakeProgressPromptString:
     def test_base(self, protocol_fixture):
         """Basic Test"""
         # Arrange
-        mocked_datetime = Mock()
-        current_time_mocked_value = datetime(2025, 2, 19, 16, 55, 3, 708629)
-        mocked_datetime.now.configure_mock(return_value=current_time_mocked_value)
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
 
         epoch = 1
         step = 2
@@ -63,21 +62,20 @@ class TestProtocolMakeProgressPromptString:
         protocol_fixture.args.num_epochs = 5
 
         # Act
-        with patch("utils.utils.datetime", mocked_datetime):
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
             result = protocol_fixture.make_progress_prompt_string(
                 epoch, step, total_steps, it_per_sec=it_per_sec
             )
 
         # Assert
-        expected = "2025-02-19 16:55:03.70 Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
+        expected = "dummy_dt_string Epoch [1/5], Step [2/3500], 325.7 Dummy_Images/sec\n"
         assert result == expected
 
     def test_with_loss(self, protocol_fixture):
         """Test where loss is specified"""
         # Arrange
-        mocked_datetime = Mock()
-        current_time_mocked_value = datetime(2025, 2, 19, 16, 55, 3, 708629)
-        mocked_datetime.now.configure_mock(return_value=current_time_mocked_value)
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
 
         epoch = 1
         step = 2
@@ -93,13 +91,13 @@ class TestProtocolMakeProgressPromptString:
         protocol_fixture.args.num_epochs = 5
 
         # Act
-        with patch("utils.utils.datetime", mocked_datetime):
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
             result = protocol_fixture.make_progress_prompt_string(
                 epoch, step, total_steps, loss=loss, it_per_sec=it_per_sec
             )
 
         # Assert
-        expected = "2025-02-19 16:55:03.70 Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
+        expected = "dummy_dt_string Epoch [1/5], Step [2/3500], Loss: 6.8346, 325.7 Dummy_Images/sec\n"
         assert result == expected
         loss.detach.assert_called_once_with()
         detach.item.assert_called_once_with()
@@ -119,9 +117,8 @@ class TestProtocolMakeInfoText:
             "ignored\n"
         )
         mocked_check_output.configure_mock(return_value=model_mocked_value.encode())
-        mocked_datetime = Mock()
-        current_time_mocked_value = datetime(2025, 2, 19, 16, 55, 3, 708629)
-        mocked_datetime.now.configure_mock(return_value=current_time_mocked_value)
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
 
         mocked_platform = Mock()
         mocked_uname = Mock()
@@ -155,7 +152,7 @@ class TestProtocolMakeInfoText:
         # Act
         with (
             patch("utils.utils.subprocess.check_output", mocked_check_output),
-            patch("utils.utils.datetime", mocked_datetime),
+            patch("utils.utils.dt_now_to_str", mocked_dt_now_str),
             patch("utils.utils.platform", mocked_platform)
         ):
             result = protocol_fixture.make_info_text()
@@ -188,7 +185,7 @@ Used data augmentation: True
 Checkpoint folder: /pytorch-benchmarks/model_checkpoints/dummy_1_NVIDIAGeForceGTX1650_resnet50_64_lr0001
 Number of workers: 7
 Warm up steps: 11
-Benchmark start : 2025-02-19 16:55:03.70
+Benchmark start : dummy_dt_string
 
 """
         assert result == expected
