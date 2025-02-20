@@ -357,29 +357,35 @@ class Protocol(object):
                     self.log_file.update_csv_file(epoch, evaluation_results_per_epoch.values())
         return True
 
+    def finish_string(self) -> str:
+        """
+        Creates a string with the finished benchmark results.
+        Returns this final string.
+        """
+        if self.args.mean_it_per_sec:
+            mean_it_per_sec_str = self.benchmark.make_final_mean_it_per_sec_string()
+        else:
+            mean_it_per_sec_str = ''
+        if self.gpu_info:
+            max_temp_str = self.gpu_info.get_max_temperature_str()
+        else:
+            max_temp_str = ''
+        total_evaluation_results_str = ''
+        if self.total_evaluation_results:
+            for epoch, evaluation_results_per_epoch in self.total_evaluation_results.items():
+                total_evaluation_results_str += f'\nEpoch {epoch}: '
+                for key, value in evaluation_results_per_epoch.items():
+                    total_evaluation_results_str += f'{key}: {value}   '
+
+        end_time = dt_now_to_str()
+        final_str = mean_it_per_sec_str + max_temp_str + total_evaluation_results_str + self.error_report + f'\n\nBenchmark end: {end_time}\n'
+
+        return final_str
 
     def finish_benchmark(self):
-        """Writes benchmark results in a text file and calculates the mean.
-        Returns the mean iterations per sec.
-        """
+        """Writes final benchmark results to a file"""
         if self.rank == 0:
-            if self.args.mean_it_per_sec:
-                mean_it_per_sec_str = self.benchmark.make_final_mean_it_per_sec_string()
-            else:
-                mean_it_per_sec_str = ''
-            if self.gpu_info:
-                max_temp_str = self.gpu_info.get_max_temperature_str()
-            else:
-                max_temp_str = ''
-            total_evaluation_results_str = ''
-            if self.total_evaluation_results:
-                for epoch, evaluation_results_per_epoch in self.total_evaluation_results.items():
-                    total_evaluation_results_str += f'\nEpoch {epoch}: '
-                    for key, value in evaluation_results_per_epoch.items():
-                        total_evaluation_results_str += f'{key}: {value}   '
-
-            end_time = dt_now_to_str()
-            final_str = mean_it_per_sec_str + max_temp_str + total_evaluation_results_str + self.error_report + f'\n\nBenchmark end: {end_time}\n'
+            final_str = self.finish_string()
             if self.args.log_file:
                 self.log_file.finish_log_file(final_str)
             print(final_str)

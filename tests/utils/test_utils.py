@@ -189,3 +189,78 @@ Benchmark start : dummy_dt_string
 
 """
         assert result == expected
+
+
+class TestProtocolFinishString:
+    """
+    Tests Protocol's class finish_string method.
+    """
+    def test_base(self, protocol_fixture):
+        """Basic test"""
+        # Arrange
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
+
+        # Act
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
+            result = protocol_fixture.finish_string()
+
+        # Assert
+        expected = "\n\n\nBenchmark end: dummy_dt_string\n"
+        assert result == expected
+
+    def test_with_mean_it_per_sec(self, protocol_fixture):
+        """Test when mean iteration per second argument is set"""
+        # Arrange
+        protocol_fixture.args.mean_it_per_sec = True
+        protocol_fixture.benchmark = Mock()
+        protocol_fixture.benchmark.make_final_mean_it_per_sec_string.configure_mock(return_value="dummy mean_it_per_sec string")
+        protocol_fixture.gpu_info = False
+
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
+
+        # Act
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
+            result = protocol_fixture.finish_string()
+
+        # Assert
+        expected = "dummy mean_it_per_sec string\n\nBenchmark end: dummy_dt_string\n"
+        assert result == expected
+
+    def test_with_gpu_info(self, protocol_fixture):
+        """Test when gpu_info is present"""
+        # Arrange
+        protocol_fixture.args.mean_it_per_sec = False
+        protocol_fixture.gpu_info = Mock()
+        protocol_fixture.gpu_info.get_max_temperature_str.configure_mock(return_value="dummy max_temperature string")
+
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
+
+        # Act
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
+            result = protocol_fixture.finish_string()
+
+        # Assert
+        expected = "dummy max_temperature string\n\nBenchmark end: dummy_dt_string\n"
+        assert result == expected
+
+    def test_with_all(self, protocol_fixture):
+        """Test when all the options that impact this string are specified"""
+        # Arrange
+        protocol_fixture.args.mean_it_per_sec = True
+        protocol_fixture.benchmark = Mock()
+        protocol_fixture.benchmark.make_final_mean_it_per_sec_string.configure_mock(return_value="dummy mean_it_per_sec string")
+        protocol_fixture.gpu_info = Mock()
+        protocol_fixture.gpu_info.get_max_temperature_str.configure_mock(return_value="dummy max_temperature string")
+        mocked_dt_now_str = Mock()
+        mocked_dt_now_str.configure_mock(return_value="dummy_dt_string")
+
+        # Act
+        with patch("utils.utils.dt_now_to_str", mocked_dt_now_str):
+            result = protocol_fixture.finish_string()
+
+        # Assert
+        expected = "dummy mean_it_per_sec stringdummy max_temperature string\n\nBenchmark end: dummy_dt_string\n"
+        assert result == expected
