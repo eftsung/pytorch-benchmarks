@@ -103,24 +103,28 @@ try:
                                 f'/ {round((current_memory_usage_list[gpu_id][1] / 1024) / 1024 / 1024, 1)}] GB\n'
             return gpu_info_str
 
-        def get_list_of_max_temperatures_of_each_gpu(self):
+        def get_list_of_max_temps_memusage_of_each_gpu(self):
             """Returns a list containing the maximum temperatures of all gpus ordered by rank.
             """
             if self.gpu_temp_list:
                 gpu_temp_array = np.array(self.gpu_temp_list).transpose()
-                return [max(gpu_temp_array[gpu_id]) for gpu_id in range(self.num_gpus)]
+                memory_usage_array = np.array(self.memory_usage_list).transpose()
+                return [
+                    (max(gpu_temp_array[gpu_id]), max(memory_usage_array[0][gpu_id]))
+                    for gpu_id in range(self.num_gpus)
+                ]
 
         def get_max_temperature_str(self):
             """Calculates the maximum temperature for each GPU and returns a string containing these infos.
             """
-            max_temp_list = self.get_list_of_max_temperatures_of_each_gpu()
+            max_temp_list = self.get_list_of_max_temps_memusage_of_each_gpu()
             
             if max_temp_list:
-                max_temp_str = f'\nMaximum temperature(s): '
-                for gpu_id, max_temp in enumerate(max_temp_list):
+                max_temp_str = f'\nMax resources used, GPU temp / GPU memory: '
+                for gpu_id, (max_temp, max_mem) in enumerate(max_temp_list):
                     if not gpu_id == 0:
                         max_temp_str += '   ||  '
-                    max_temp_str += f'GPU {gpu_id}: {max_temp} °C'
+                    max_temp_str += f'GPU {gpu_id}: {max_temp} °C / {max_mem/1024**3:.3f} GB'
                 return max_temp_str
             else:
                 return ''
