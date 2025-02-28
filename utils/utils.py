@@ -114,20 +114,31 @@ try:
                     for gpu_id in range(self.num_gpus)
                 ]
 
-        def get_max_temperature_str(self):
+        def get_max_temperature_str(self, reset_peak_mem_stats=False):
             """Calculates the maximum temperature for each GPU and returns a string containing these infos.
             """
             max_temp_list = self.get_list_of_max_temps_memusage_of_each_gpu()
-            
+
+            def _get_max_total_mem_str(_gpu_id):
+                max_total_mem = torch.cuda.max_memory_allocated(_gpu_id)
+                if reset_peak_mem_stats:
+                    torch.cuda.reset_peak_memory_stats(_gpu_id)
+                return f"{max_total_mem/1024**3:.3f} GiB"
+
             if max_temp_list:
-                max_temp_str = f'\nMax resources used, GPU temp / GPU memory: '
+                max_str = f'\nMax resources used, GPU temp / GPU memory (dedicated) / GPU memory (total): '
                 for gpu_id, (max_temp, max_mem) in enumerate(max_temp_list):
                     if not gpu_id == 0:
-                        max_temp_str += '   ||  '
-                    max_temp_str += f'GPU {gpu_id}: {max_temp} °C / {max_mem/1024**3:.3f} GB'
-                return max_temp_str
+                        max_str += '   ||  '
+                    max_str += f'GPU {gpu_id}: {max_temp} °C / {max_mem/1024**3:.3f} GiB / '
+                    max_str += _get_max_total_mem_str(gpu_id)
+                return max_str
             else:
-                return ''
+                max_str = f"\nMax resources used, GPU memory (total): "
+                max_str += " || ".join(
+                    [_get_max_total_mem_str(gpu_id) for gpu_id in range(self.num_gpus)]
+                )
+                return max_str
 
 except ModuleNotFoundError:
     pass
@@ -334,7 +345,8 @@ class Protocol(object):
 
         if self.rank == 0:
             if self.gpu_info:
-                prompt_str += self.gpu_info.get_max_temperature_str()
+                is_last_epoch = self.args.num_epochs == epoch
+                prompt_str += self.gpu_info.get_max_temperature_str(not is_last_epoch)
             if not self.eval_mode:
                 prompt_str += '\nTraining '
                 if not self.args.skip_checkpoint:
