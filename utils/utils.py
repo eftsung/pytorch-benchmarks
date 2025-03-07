@@ -232,7 +232,7 @@ class Benchmark(object):
 
     def calc_mean_it_per_sec(self, it_per_sec_dict):
         if len(it_per_sec_dict):
-            mean_it_per_sec = round(np.array(list(it_per_sec_dict.values())).mean())
+            mean_it_per_sec = np.array(list(it_per_sec_dict.values())).mean()
         else:
             mean_it_per_sec = 0
         return mean_it_per_sec
