@@ -8,11 +8,11 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "torch (>=2.6.0,<3.0.0)",
-    "torchvision (>=0.21.0,<0.22.0)",
     "numpy (>=2.2.3,<3.0.0)",
     "matplotlib (>=3.10.0,<4.0.0)",
-    "nvidia-ml-py3 (>=7.352.0,<8.0.0)"
+    "nvidia-ml-py3 (>=7.352.0,<8.0.0)",
+    "torch (>=2.7.0.dev20250309,<3.0.0)",
+    "torchvision (>=0.22.0.dev20250309,<0.23.0)"
 ]
 
 
@@ -24,3 +24,13 @@ package-mode = false
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 
+
+[[tool.poetry.source]]
+name = "pytorch-gpu-src"
+url = "https://download.pytorch.org/whl/nightly/cu128"
+priority = "explicit"
+
+
+[tool.poetry.dependencies]
+torch = {source = "pytorch-gpu-src"}
+torchvision = {source = "pytorch-gpu-src"}
