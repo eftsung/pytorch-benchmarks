@@ -1,0 +1,30 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.2
+    hooks:
+      - id: flake8
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/PyCQA/pylint
+    rev: v3.3.5
+    hooks:
+      - id: pylint
+exclude: |
+    (?x)^(
+        main.py|
+        (data|models)/.*|
+        utils/(
+            flags.py|
+            gpu_live_plot.py|
+            optimizer.py|
+            plot_val_acc_from_logfile.py|
+            utils.py|
+            zero_redundancy_optimizer.py
+        )
+    )$
